@@ -6,6 +6,7 @@
 #include <string.h>
 #include "compiler.h"
 #include "lexer.h"
+#include <iostream>
 #include <map>
 
 using namespace std;
@@ -91,7 +92,7 @@ struct InstructionNode *parse_generate_intermediate_representation()
         token = lexer.GetToken();
         // if the token type is LBRACE then that means
         // this method was called from a recurssive method
-        // in WHILE or IF. At that point we already have the
+        // in WHILE, IF, FOR or SWITCH. At that point we already have the
         // var body so break
         if (token.token_type == LBRACE)
         {
@@ -511,6 +512,44 @@ struct InstructionNode *parse_generate_intermediate_representation()
 
             // When the while loop fails it jumps to this NOOP statement
             forNode->cjmp_inst.target = noopNode;
+        }
+        else if (token.token_type == SWITCH)
+        {
+            cout << "token1: " << token.token_type << endl;
+            Token condVar = lexer.GetToken();
+            bool caseSuccess = false;
+            cout << "token2: " << token.token_type << endl;
+            if (token.token_type == LBRACE)
+            {
+                token = lexer.GetToken();
+            }
+            cout << "token3: " << token.token_type << endl;
+
+            do
+            {
+                // get the token
+                token = lexer.GetToken();
+                // if our token is of type CASE we know the next token is the second variable we need
+                // to compare our tokens
+                if (token.token_type == CASE && lexer.peek(1).lexeme == condVar.lexeme)
+                {
+                    // get the var
+                    token = lexer.GetToken();
+                    // get the colon
+                    token = lexer.GetToken();
+                    // get the body
+                    InstructionNode *tempHead = parse_generate_intermediate_representation();
+                    head = insertList(head, last, tempHead);
+                    caseSuccess = true;
+                }
+
+            } while (token.token_type != DEFAULT);
+
+            // if this is not true then we run our default case
+
+            if (!caseSuccess)
+            {
+            }
         }
     } while (token.token_type != RBRACE);
 

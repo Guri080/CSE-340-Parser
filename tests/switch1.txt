@@ -1,10 +1,16 @@
 i, j;
 {
-	input i;
-    FOR(i = 10; i > 0; i=i-1;)
-    {
-  	j = i - 1;
-	output j;
+    i = 0;
+    j = 0;
+	switch i {
+        CASE i : { 
+            j = j + 1;
+            output j;
+        }
+        CASE j : {
+            i = i + 1;
+            output j;
+        }
     }
 }
 1
